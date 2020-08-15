@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import easyimap
 import imaplib
 import smtplib
@@ -7,6 +8,8 @@ import numpy as np
 import os
 import pytube
 import subprocess
+import youtube_dl
+import time
 
 VIDEO_PATH = "E:\\YouTube"
 AUDIO_PATH = "E:\\Podcasts"
@@ -163,15 +166,8 @@ def SaveVideos(url, folder):
         yt= pytube.YouTube(url)
         yt.streams.get_highest_resolution().download(folder)
 
-def SaveAudio(url, folder):
+def SaveAudio(urls, folder):
     """ Saves audio tracks from youtube videos"""
-    if 'list=' in url:
-        playlist = pytube.Playlist(url)
-        # this fixes the empty playlist.videos list
-        playlist._video_regex = re.compile(r"\"url\":\"(/watch\?v=[\w-]*)")
-        urls = playlist.video_urls
-    else:
-        urls = [url]
     for i in urls:
         yt = pytube.YouTube(i)
         yt.streams.get_audio_only().download(folder)
@@ -180,22 +176,76 @@ def SaveAudio(url, folder):
         subprocess.call([                               # or subprocess.run (Python 3.5+)
             "C:\\FFmpeg\\bin\\ffmpeg.exe",
             '-i', os.path.join(folder, title),
-            os.path.join(folder, title2)
+            os.path.join(folder, title2.replace(' [OFFICIAL VIDEO]', '').replace(' (Audio)', '').replace(' (Official Audio)', ''))
         ])
         os.remove(os.path.join(folder, title))
 
+def Download(youtube_url, media_type):
+    if media_type == 'audio' or media_type == 'podcast':
+        base = 'E:\\Podcasts\\'
+    elif media_type == 'music':
+        base = 'E:\\Music\\'
+    elif media_type == 'video':
+        base = 'E:\\Youtube\\'
+
+    infos = GetInfo(youtube_url)
+    if 'list' in youtube_url:
+        artist = infos[0]['playlist_uploader'].lower().title()
+        album = infos[0]['playlist_title']
+    else:
+        artist = infos[0]['uploader']
+        album = 'Other'
+
+    if media_type != 'video':
+            SaveAudio([i['webpage_url'] for i in infos], os.path.join(base, artist, album))
+    else:
+        for info in infos:
+            url = info['webpage_url']
+            title = info['title'].replace(':', '#')
+            ext = info['ext']
+            file_path = os.path.join(base, artist, album, title + '.' + ext)
+            
+            
+            ydl_opts = {
+                    'format': 'bestvideo',
+                    'outtmpl': file_path
+                }
+            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([url])
+            
+
+def GetInfo(playlist_url):
+    ydl = youtube_dl.YoutubeDL({'outtmpl': '%(id)s%(ext)s', 'quiet':True,})
+    video = ""
+    info = []
+    with ydl:
+        result = ydl.extract_info \
+        (playlist_url,
+        download=False) #We just want to extract the info
+
+        if 'entries' in result:
+            # Can be a playlist or a list of videos
+            video = result['entries']
+
+            #loops entries to grab each video_url
+            for i, item in enumerate(video):
+                video = result['entries'][i]
+                info.append(result['entries'][i])
+        return info
+
 def Save(email):
     try:
-        if email['type'] == 'video':
-            save_path = os.path.join(VIDEO_PATH, email['folder'])
-            SaveVideos(email['url'], save_path)
-        elif email['type'] == 'music':
-            save_path = os.path.join(MUSIC_PATH, email['folder'])
-            SaveAudio(email['url'], save_path)
-        else:
-            save_path = os.path.join(AUDIO_PATH, email['folder'])
-            SaveAudio(email['url'], save_path)
-        return True
+        Download(email['url'], email['type'])
+        # if email['type'] == 'video':
+        #     save_path = os.path.join(VIDEO_PATH, email['folder'])
+        #     SaveVideos(email['url'], save_path)
+        # elif email['type'] == 'music':
+        #     save_path = os.path.join(MUSIC_PATH, email['folder'])
+        #     SaveAudio(email['url'], save_path)
+        # else:
+        #     save_path = os.path.join(AUDIO_PATH, email['folder'])
+        #     SaveAudio(email['url'], save_path)
+        # return True
     except Exception as e:
         SendEmail(email['from'], email['subject'], 'Something went wrong while downloading the '+ email['type']+ ' file: '+ email['url'] +
         'The error was: ' + str(e))

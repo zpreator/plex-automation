@@ -11,8 +11,8 @@ from moviepy.editor import *
 # video = VideoFileClip(os.path.join(folder,"twenty one pilots - Jumpsuit (Official Video).mp4"))
 # video.audio.write_audiofile(os.path.join(folder, "twenty one pilots - Jumpsuit (Official Video).mp3"))
 
-playlist = pytube.Playlist("https://www.youtube.com/playlist?list=OLAK5uy_mWtWynXa5NeLQEJjvrmVZmmO48G4eBBWg")
-# this fixes the empty playlist.videos list
-playlist._video_regex = re.compile(r"\"url\":\"(/watch\?v=[\w-]*)")
-urls = playlist.video_urls
-print(urls)
+# playlist = pytube.Playlist("https://www.youtube.com/playlist?list=OLAK5uy_mWtWynXa5NeLQEJjvrmVZmmO48G4eBBWg")
+# # this fixes the empty playlist.videos list
+# playlist._video_regex = re.compile(r"\"url\":\"(/watch\?v=[\w-]*)")
+# urls = playlist.video_urls
+# print(urls)
