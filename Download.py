@@ -2,10 +2,11 @@ import pytube
 import youtube_dl
 import os
 import subprocess
-
-VIDEO_PATH = "C:\\YouTube"
-AUDIO_PATH = "C:\\Podcasts"
-MUSIC_PATH = "C:\\Music"
+from ConfigReader import GetPaths
+var = GetPaths()
+VIDEO_PATH = var['youtube']
+AUDIO_PATH = var['podcasts']
+MUSIC_PATH = var['music']
 
 def SaveAudio(videos, base, artist):
     """ Saves audio tracks from youtube videos"""
@@ -16,7 +17,7 @@ def SaveAudio(videos, base, artist):
         album = video['playlist']
         file_path = os.path.join(base, artist, album, title + '.' + ext)
         ydl_opts = {
-                'ffmpeg_location': "C:\\ffmpeg\\bin\\ffmpeg.exe",
+                'ffmpeg_location': var['ffmpeg'],
                 'format': 'bestaudio',
                 'outtmpl': file_path
             }
@@ -31,7 +32,7 @@ def SaveVideo(videos, base, artist):
         file_path = os.path.join(base, artist, title + '.' + ext)
         
         ydl_opts = {
-                'ffmpeg_location': "C:\\ffmpeg\\bin\\ffmpeg.exe",
+                'ffmpeg_location': var['ffmpeg'],
                 'format': 'bestvideo',
                 'outtmpl': file_path
             }
