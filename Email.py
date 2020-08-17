@@ -9,6 +9,7 @@ from ConfigReader import GetUsernamePassword
 
 # imap_ssl_host = 'imap.gmail.com'
 # imap_ssl_port = 993
+
 var = GetUsernamePassword()
 username = var['username']
 password = var['password']
