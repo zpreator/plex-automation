@@ -174,7 +174,7 @@ def SaveAudio(urls, folder):
         title = yt.streams.get_audio_only().default_filename
         title2 = os.path.splitext(title)[0] + '.mp3'
         subprocess.call([                               # or subprocess.run (Python 3.5+)
-            "C:\\FFmpeg\\bin\\ffmpeg.exe",
+            "C:\\ffmpeg\\bin\\ffmpeg.exe",
             '-i', os.path.join(folder, title),
             os.path.join(folder, title2.replace(' [OFFICIAL VIDEO]', '').replace(' (Audio)', '').replace(' (Official Audio)', ''))
         ])
@@ -182,11 +182,11 @@ def SaveAudio(urls, folder):
 
 def Download(youtube_url, media_type):
     if media_type == 'audio' or media_type == 'podcast':
-        base = 'E:\\Podcasts\\'
+        base = 'C:\\Podcasts\\'
     elif media_type == 'music':
-        base = 'E:\\Music\\'
+        base = 'C:\\Music\\'
     elif media_type == 'video':
-        base = 'E:\\Youtube\\'
+        base = 'C:\\Youtube\\'
 
     infos = GetInfo(youtube_url)
     if 'list' in youtube_url:
@@ -203,11 +203,11 @@ def Download(youtube_url, media_type):
             url = info['webpage_url']
             title = info['title'].replace(':', '#')
             ext = info['ext']
-            file_path = os.path.join(base, artist, album, title + '.' + ext)
-            
+            file_path = os.path.join(base, artist, title + '.' + ext)
             
             ydl_opts = {
-                    'format': 'bestvideo',
+                    'ffmpeg_location': "C:\\ffmpeg\\bin\\ffmpeg.exe",
+                    'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4',
                     'outtmpl': file_path
                 }
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
