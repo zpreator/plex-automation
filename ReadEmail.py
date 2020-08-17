@@ -182,11 +182,11 @@ def SaveAudio(urls, folder):
 
 def Download(youtube_url, media_type):
     if media_type == 'audio' or media_type == 'podcast':
-        base = 'C:\\Podcasts\\'
+        base = AUDIO_PATH
     elif media_type == 'music':
-        base = 'C:\\Music\\'
+        base = MUSIC_PATH
     elif media_type == 'video':
-        base = 'C:\\Youtube\\'
+        base = VIDEO_PATH
 
     infos = GetInfo(youtube_url)
     if 'list' in youtube_url:
@@ -202,7 +202,7 @@ def Download(youtube_url, media_type):
         for info in infos:
             url = info['webpage_url']
             title = info['title'].replace(':', '#')
-            ext = info['ext']
+            ext = info['ext'].replace('webm', 'mp4')
             file_path = os.path.join(base, artist, title + '.' + ext)
             
             ydl_opts = {
