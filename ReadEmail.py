@@ -231,6 +231,8 @@ def GetInfo(playlist_url):
             for i, item in enumerate(video):
                 video = result['entries'][i]
                 info.append(result['entries'][i])
+        else:
+            info.append(result)
         return info
 
 def Save(email):
