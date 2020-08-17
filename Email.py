@@ -6,10 +6,11 @@ import re
 import numpy as np
 import os
 
-imap_ssl_host = 'imap.gmail.com'
-imap_ssl_port = 993
-username = 'icebergplex@gmail.com'
-password = 'Oct0pu$20'
+# imap_ssl_host = 'imap.gmail.com'
+# imap_ssl_port = 993
+data = np.loadtxt('C:\Repos\plex-automation\localConfig.txt')
+username = 
+password = 
 server = imaplib.IMAP4_SSL(imap_ssl_host, imap_ssl_port)
 
 def FilterSubject(subject):
